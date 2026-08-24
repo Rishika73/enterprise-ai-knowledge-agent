@@ -1,0 +1,9 @@
+Artificial intelligence systems are increasingly used to help organizations search, summarize, and reason over large collections of information.
+
+A retrieval-augmented generation system combines information retrieval with a large language model. Instead of relying only on information stored in the model's parameters, the system first searches relevant documents and provides the retrieved context to the language model.
+
+This approach can improve answer relevance and reduce hallucinations when the retrieved information is accurate and properly cited. A production-ready knowledge assistant should also include source attribution, evaluation, monitoring, access controls, and safeguards against prompt injection.
+
+Vector databases are commonly used to store embeddings representing document chunks. When a user asks a question, the query is converted into an embedding and compared against stored document vectors to retrieve semantically similar content.
+
+Hybrid retrieval can combine semantic vector search with keyword-based search. Reranking can then be used to improve the ordering of retrieved documents before they are passed to the language model.
