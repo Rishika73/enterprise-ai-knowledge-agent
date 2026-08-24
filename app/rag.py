@@ -1,0 +1,95 @@
+import os
+from typing import List, Dict
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from retriever import retrieve
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+def build_context(results: List[Dict]) -> str:
+    context_parts = []
+
+    for i, result in enumerate(results, start=1):
+        context_parts.append(
+            f"[Source {i}]\n{result['text']}"
+        )
+
+    return "\n\n".join(context_parts)
+
+
+def generate_answer(
+    query: str,
+    file_path: str,
+    top_k: int = 3
+) -> Dict:
+
+    results = retrieve(
+        query=query,
+        file_path=file_path,
+        top_k=top_k
+    )
+
+    if not results:
+        return {
+            "answer": "No relevant information was found.",
+            "sources": []
+        }
+
+    context = build_context(results)
+
+    prompt = f"""
+You are an enterprise knowledge assistant.
+
+Answer the user's question using ONLY the provided context.
+
+Rules:
+- Do not invent information.
+- If the answer is not supported by the context, say that the information is not available.
+- Cite supporting sources using [Source 1], [Source 2], etc.
+- Keep the answer clear and concise.
+
+Context:
+{context}
+
+Question:
+{query}
+"""
+
+    response = client.responses.create(
+        model="gpt-5-mini",
+        input=prompt
+    )
+
+    return {
+        "answer": response.output_text,
+        "sources": results
+    }
+
+
+if __name__ == "__main__":
+
+    question = (
+        "How does retrieval augmented generation "
+        "help reduce hallucinations?"
+    )
+
+    result = generate_answer(
+        query=question,
+        file_path="data/sample_document.txt"
+    )
+
+    print("\nANSWER\n")
+    print(result["answer"])
+
+    print("\nSOURCES\n")
+
+    for source in result["sources"]:
+        print(
+            f"Chunk {source['chunk_id']} "
+            f"(score={source['score']:.4f})"
+        )
