@@ -2,3 +2,4 @@ python-dotenv
 pypdf
 sentence-transformers
 numpy
+openai
