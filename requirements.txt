@@ -3,3 +3,5 @@ pypdf
 sentence-transformers
 numpy
 openai
+fastapi
+uvicorn
