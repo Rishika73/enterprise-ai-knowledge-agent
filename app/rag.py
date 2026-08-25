@@ -4,7 +4,7 @@ from typing import List, Dict
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from retriever import retrieve
+from app.retriever import retrieve
 
 load_dotenv()
 
