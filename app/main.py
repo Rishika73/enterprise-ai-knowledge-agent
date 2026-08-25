@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from rag import generate_answer
+from app.rag import generate_answer
 
 app = FastAPI(
     title="Enterprise AI Knowledge Agent",
