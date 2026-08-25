@@ -1,5 +1,5 @@
-from ingest import ingest_document
-from vector_store import VectorStore
+from app.ingest import ingest_document
+from app.vector_store import VectorStore
 
 
 def build_retriever(file_path: str) -> VectorStore:
