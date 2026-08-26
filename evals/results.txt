@@ -1,0 +1,15 @@
+RAG Evaluation Results
+
+Test 1
+Question: How does retrieval augmented generation help reduce hallucinations?
+Keyword Score: 1.00
+
+Test 2
+Question: What is hybrid retrieval?
+Keyword Score: 1.00
+
+Test 3
+Question: Why are vector databases used in RAG systems?
+Keyword Score: 1.00
+
+Average Keyword Score: 1.00
