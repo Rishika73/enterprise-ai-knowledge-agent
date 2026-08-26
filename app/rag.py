@@ -4,7 +4,7 @@ from typing import List, Dict
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from app.retriever import retrieve
+from app.hybrid_retriever import hybrid_search
 
 load_dotenv()
 
@@ -28,11 +28,11 @@ def generate_answer(
     top_k: int = 3
 ) -> Dict:
 
-    results = retrieve(
-        query=query,
-        file_path=file_path,
-        top_k=top_k
-    )
+    results = hybrid_search(
+    query=query,
+    file_path=file_path,
+    top_k=top_k
+)
 
     if not results:
         return {
