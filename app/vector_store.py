@@ -1,26 +1,47 @@
 from typing import List, Dict
+import os
 import numpy as np
 
-from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class VectorStore:
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(model_name)
+    def __init__(self):
         self.documents: List[Dict] = []
         self.embeddings = None
+
+    def _embed_texts(self, texts: List[str]) -> np.ndarray:
+        response = client.embeddings.create(
+            model="text-embedding-3-small",
+            input=texts
+        )
+
+        vectors = [
+            item.embedding
+            for item in response.data
+        ]
+
+        embeddings = np.array(vectors, dtype=np.float32)
+
+        norms = np.linalg.norm(
+            embeddings,
+            axis=1,
+            keepdims=True
+        )
+
+        return embeddings / np.clip(norms, 1e-12, None)
 
     def add_documents(self, chunks: List[Dict]) -> None:
         if not chunks:
             return
 
         texts = [chunk["text"] for chunk in chunks]
-
-        embeddings = self.model.encode(
-            texts,
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )
+        embeddings = self._embed_texts(texts)
 
         if self.embeddings is None:
             self.embeddings = embeddings
@@ -35,11 +56,7 @@ class VectorStore:
         if self.embeddings is None or not self.documents:
             return []
 
-        query_embedding = self.model.encode(
-            [query],
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )[0]
+        query_embedding = self._embed_texts([query])[0]
 
         scores = np.dot(
             self.embeddings,
