@@ -1,0 +1,21 @@
+Groundedness Evaluation Results
+
+Test 1
+Question: How does retrieval augmented generation help reduce hallucinations?
+Sources Returned: 1
+Contains Citation: True
+Groundedness Proxy Score: 1.00
+
+Test 2
+Question: What is hybrid retrieval?
+Sources Returned: 1
+Contains Citation: True
+Groundedness Proxy Score: 1.00
+
+Test 3
+Question: Why are vector databases used in RAG systems?
+Sources Returned: 1
+Contains Citation: True
+Groundedness Proxy Score: 1.00
+
+Average Groundedness Proxy Score: 1.00
