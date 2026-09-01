@@ -2,13 +2,24 @@ import os
 from typing import List, Dict
 
 from dotenv import load_dotenv
-from openai import OpenAI
 
 from app.hybrid_retriever import hybrid_search
 
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def get_openai_client():
+    from openai import OpenAI
+
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is not configured.")
+
+    return OpenAI(
+        api_key=api_key,
+        timeout=30.0
+    )
 
 
 def build_context(results: List[Dict]) -> str:
@@ -28,11 +39,15 @@ def generate_answer(
     top_k: int = 3
 ) -> Dict:
 
+    print("Starting retrieval...")
+
     results = hybrid_search(
-    query=query,
-    file_path=file_path,
-    top_k=top_k
-)
+        query=query,
+        file_path=file_path,
+        top_k=top_k
+    )
+
+    print(f"Retrieved {len(results)} source chunks.")
 
     if not results:
         return {
@@ -60,10 +75,16 @@ Question:
 {query}
 """
 
+    print("Calling language model...")
+
+    client = get_openai_client()
+
     response = client.responses.create(
         model="gpt-5-mini",
         input=prompt
     )
+
+    print("Language model response received.")
 
     return {
         "answer": response.output_text,
