@@ -4,3 +4,4 @@ numpy
 openai
 fastapi
 uvicorn
+langgraph
