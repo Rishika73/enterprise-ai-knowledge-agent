@@ -6,6 +6,7 @@ from langgraph.graph import StateGraph, END
 
 from app.hybrid_retriever import hybrid_search
 from app.reranker import rerank_results
+from app.security import sanitize_retrieved_text
 
 load_dotenv()
 
@@ -38,8 +39,12 @@ def build_context(results: List[Dict[str, Any]]) -> str:
     context_parts = []
 
     for i, result in enumerate(results, start=1):
+        safe_text = sanitize_retrieved_text(
+            result["text"]
+        )
+
         context_parts.append(
-            f"[Source {i}]\n{result['text']}"
+            f"[Source {i}]\n{safe_text}"
         )
 
     return "\n\n".join(context_parts)
