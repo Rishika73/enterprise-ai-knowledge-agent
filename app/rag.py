@@ -43,16 +43,16 @@ def generate_answer(
     print("Starting retrieval...")
 
     initial_results = hybrid_search(
-    query=query,
-    file_path=file_path,
-    top_k=max(top_k * 3, top_k)
-)
+        query=query,
+        file_path=file_path,
+        top_k=max(top_k * 3, top_k)
+    )
 
-results = rerank_results(
-    query=query,
-    results=initial_results,
-    top_k=top_k
-)
+    results = rerank_results(
+        query=query,
+        results=initial_results,
+        top_k=top_k
+    )
 
     print(f"Retrieved {len(results)} source chunks.")
 
