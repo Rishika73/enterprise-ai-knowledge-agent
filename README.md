@@ -557,7 +557,3 @@ Potential future extensions include:
 - production deployment
 
 ---
-
-## Disclaimer
-
-This repository is a portfolio implementation intended to demonstrate practical AI engineering patterns. The included evaluation metrics are lightweight development checks rather than production benchmarking.
