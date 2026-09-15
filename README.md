@@ -1,5 +1,7 @@
 # Enterprise AI Knowledge Agent
 
+**Tech Stack:** Python · FastAPI · LangGraph · OpenAI API · RAG · Hybrid Retrieval · Reranking · Pytest · Docker · GitHub Actions
+
 A production-style enterprise knowledge assistant built with Retrieval-Augmented Generation (RAG), LangGraph, FastAPI, hybrid retrieval, reranking, evaluation, prompt-injection protection, Docker, and automated CI testing.
 
 The project demonstrates how to build a source-grounded AI assistant that retrieves relevant enterprise knowledge, reranks candidate documents, generates cited responses, and applies basic security controls before sending retrieved content to the language model.
