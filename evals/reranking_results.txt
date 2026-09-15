@@ -1,0 +1,42 @@
+Reranking Comparison Results
+
+Question 1:
+How does retrieval augmented generation reduce hallucinations?
+
+Before reranking:
+chunk=13 hybrid=0.6307
+chunk=0 hybrid=0.6009
+chunk=12 hybrid=0.4522
+
+After reranking:
+chunk=13 rerank=0.6474
+chunk=0 rerank=0.6236
+chunk=12 rerank=0.4475
+
+
+Question 2:
+What is hybrid retrieval?
+
+Before reranking:
+chunk=8 hybrid=0.6389
+chunk=9 hybrid=0.4938
+chunk=0 hybrid=0.4677
+
+After reranking:
+chunk=8 rerank=0.6611
+chunk=9 rerank=0.4950
+chunk=0 rerank=0.4742
+
+
+Question 3:
+Why are vector databases useful in RAG?
+
+Before reranking:
+chunk=4 hybrid=0.6572
+chunk=5 hybrid=0.5504
+chunk=0 hybrid=0.4359
+
+After reranking:
+chunk=4 rerank=0.6972
+chunk=5 rerank=0.5546
+chunk=12 rerank=0.4620
