@@ -8,6 +8,8 @@ The project demonstrates how to build a source-grounded AI assistant that retrie
 
 ## API Demo
 
+The `/ask` endpoint accepts a user question and returns a source-grounded RAG response.
+
 ![RAG API Demo](docs/rag_api_success.png)
 ---
 
