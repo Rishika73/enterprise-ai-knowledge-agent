@@ -53,8 +53,8 @@ def clean_text(text: str) -> str:
 
 def chunk_text(
     text: str,
-    chunk_size: int = 500,
-    overlap: int = 50
+    chunk_size: int = 120,
+    overlap: int = 20
 ) -> List[Dict]:
 
     if chunk_size <= 0:
