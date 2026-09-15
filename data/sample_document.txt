@@ -1,9 +1,420 @@
-Artificial intelligence systems are increasingly used to help organizations search, summarize, and reason over large collections of information.
+ENTERPRISE AI KNOWLEDGE BASE
 
-A retrieval-augmented generation system combines information retrieval with a large language model. Instead of relying only on information stored in the model's parameters, the system first searches relevant documents and provides the retrieved context to the language model.
 
-This approach can improve answer relevance and reduce hallucinations when the retrieved information is accurate and properly cited. A production-ready knowledge assistant should also include source attribution, evaluation, monitoring, access controls, and safeguards against prompt injection.
+SECTION 1: RETRIEVAL-AUGMENTED GENERATION
 
-Vector databases are commonly used to store embeddings representing document chunks. When a user asks a question, the query is converted into an embedding and compared against stored document vectors to retrieve semantically similar content.
+Retrieval-augmented generation, commonly called RAG, combines information retrieval with a large language model.
 
-Hybrid retrieval can combine semantic vector search with keyword-based search. Reranking can then be used to improve the ordering of retrieved documents before they are passed to the language model.
+Instead of relying only on information stored inside the model's parameters, a RAG system first searches an external knowledge source for relevant information. The retrieved information is then provided to the language model as context before the model generates an answer.
+
+This approach helps make responses more relevant to the user's question and allows the model to use information that may not have been included in its original training data.
+
+RAG can also reduce hallucinations because the model is encouraged to ground its response in retrieved evidence instead of relying entirely on internal model knowledge.
+
+When the retrieved information is accurate, relevant, and properly cited, the model can provide answers that are easier to verify.
+
+A production RAG system usually contains several stages, including document ingestion, text chunking, embedding generation, retrieval, reranking, prompt construction, answer generation, citation handling, and evaluation.
+
+
+SECTION 2: DOCUMENT INGESTION
+
+Document ingestion is the process of loading source material into a knowledge system.
+
+Enterprise knowledge assistants may need to process different types of files such as plain text files, PDF documents, technical documentation, policies, reports, product manuals, and internal knowledge articles.
+
+The ingestion layer extracts text from these documents and prepares the content for downstream processing.
+
+The extracted text should be normalized so that unnecessary whitespace, formatting artifacts, and inconsistent characters do not reduce retrieval quality.
+
+Reliable ingestion is important because problems introduced at this stage can affect every later part of the RAG pipeline.
+
+
+SECTION 3: TEXT CHUNKING
+
+Large documents are usually divided into smaller units called chunks.
+
+Chunking is necessary because retrieval systems and language models work more effectively when information is divided into manageable pieces.
+
+A chunk should ideally contain enough information to preserve meaning while remaining focused enough for accurate retrieval.
+
+If chunks are too large, they may contain unrelated information and reduce retrieval precision.
+
+If chunks are too small, important context may be separated across multiple chunks.
+
+Chunk overlap can be used to preserve information across chunk boundaries.
+
+For example, a system may create chunks containing several hundred words and reuse a smaller number of words from the previous chunk in the next chunk.
+
+Chunk size and overlap should be evaluated based on the type of documents and questions the system needs to support.
+
+
+SECTION 4: EMBEDDINGS
+
+Embeddings are numerical vector representations of text.
+
+An embedding model converts a piece of text into a list of numbers that captures semantic information about the meaning of that text.
+
+Texts with similar meanings often produce vectors that are close together in the embedding space.
+
+In a RAG system, embeddings can be created for each document chunk and stored for later retrieval.
+
+When a user asks a question, the question is also converted into an embedding.
+
+The system then compares the query embedding with the stored document embeddings to identify semantically similar content.
+
+Embedding-based search is useful because it can find relevant information even when the question and the source document use different words.
+
+
+SECTION 5: VECTOR DATABASES
+
+Vector databases are designed to store and search high-dimensional embedding vectors.
+
+They allow a retrieval system to efficiently find document chunks whose embeddings are similar to a user's query embedding.
+
+A typical workflow is:
+
+1. Create chunks from source documents.
+2. Generate an embedding for each chunk.
+3. Store the embedding together with the original text and metadata.
+4. Convert a user query into an embedding.
+5. Compare the query embedding against stored vectors.
+6. Return the most similar chunks.
+
+Vector databases are useful for semantic search because similarity is based on meaning rather than exact keyword matching.
+
+Common metadata stored with each vector may include document name, page number, section title, chunk identifier, source type, access permissions, and creation date.
+
+Metadata filtering can be combined with vector similarity search to restrict retrieval to relevant or authorized documents.
+
+
+SECTION 6: SEMANTIC SEARCH
+
+Semantic search retrieves information based on meaning.
+
+Instead of requiring exact word matches, semantic search compares the concepts represented by the user's query and the stored content.
+
+For example, a question about reducing incorrect AI responses may retrieve a document section discussing hallucination prevention even if the exact wording is different.
+
+Semantic search is particularly useful when users phrase questions differently from the original document language.
+
+However, semantic search can sometimes miss exact technical identifiers, product codes, names, or specific phrases.
+
+
+SECTION 7: KEYWORD SEARCH
+
+Keyword search retrieves documents based on matching words or phrases.
+
+This approach can be effective when a query contains exact identifiers, product names, error codes, technical terms, or specific terminology.
+
+Keyword search is often easier to understand because the matching terms can be directly inspected.
+
+However, keyword search may fail when the user and the document use different words to describe the same concept.
+
+For that reason, keyword search and semantic search are often combined in production retrieval systems.
+
+
+SECTION 8: HYBRID RETRIEVAL
+
+Hybrid retrieval combines semantic vector search with keyword-based search.
+
+The goal is to benefit from the strengths of both approaches.
+
+Semantic search helps identify conceptually related information even when wording differs.
+
+Keyword search helps preserve exact matches for important names, identifiers, technical terms, and phrases.
+
+A hybrid retrieval system can calculate both a semantic similarity score and a keyword matching score.
+
+These scores can then be combined using configurable weights.
+
+For example, a system may assign a larger weight to semantic similarity and a smaller weight to keyword overlap.
+
+The best weighting strategy depends on the type of data and the expected user questions.
+
+Hybrid retrieval can improve recall and retrieval robustness because it reduces dependence on a single search method.
+
+
+SECTION 9: RERANKING
+
+Initial retrieval often produces a larger set of candidate chunks than should be sent directly to the language model.
+
+A reranking stage evaluates those candidates again and attempts to place the most relevant chunks at the top.
+
+Reranking can use additional lexical overlap, semantic similarity, cross-encoder models, language models, or other relevance signals.
+
+The retrieval system may first retrieve ten or twenty candidate chunks and then rerank them to select the best three or five.
+
+Reranking can improve context quality because it removes weaker results and prioritizes information that is more directly related to the user's question.
+
+Better context selection can improve answer quality while reducing the number of unnecessary tokens sent to the language model.
+
+Reranking should be evaluated using multiple documents and multiple chunks so that the system has meaningful candidates to reorder.
+
+
+SECTION 10: CONTEXT CONSTRUCTION
+
+After retrieval and reranking, the selected chunks are combined into the context provided to the language model.
+
+Each chunk should ideally include source metadata so that the generated answer can reference the original information.
+
+The context may be formatted using labels such as Source 1, Source 2, and Source 3.
+
+The prompt should clearly separate trusted system instructions from retrieved document content.
+
+The system should instruct the language model to answer only using the supplied evidence when grounded answers are required.
+
+If the retrieved context does not contain enough information to answer the question, the model should state that the information is unavailable rather than inventing an answer.
+
+
+SECTION 11: SOURCE CITATIONS
+
+Source citations allow users to understand where an answer came from.
+
+A RAG system can associate each retrieved chunk with a source identifier and ask the language model to reference those identifiers in the final response.
+
+For example, a response may include a citation such as [Source 1].
+
+Citations are especially useful in enterprise environments because users may need to verify policies, procedures, technical guidance, or business information.
+
+Citation accuracy should be evaluated separately from answer quality.
+
+A response should not cite a source that does not actually support the claim being made.
+
+
+SECTION 12: HALLUCINATION REDUCTION
+
+Hallucinations occur when a language model generates information that is unsupported, incorrect, or fabricated.
+
+RAG can reduce hallucinations by supplying relevant evidence before generation.
+
+The model should be instructed to use only the retrieved context for factual claims.
+
+If the context does not support an answer, the system should return a safe fallback such as stating that the information is not available in the current knowledge base.
+
+Hallucination reduction also depends on retrieval quality.
+
+If the retrieval system returns incorrect or irrelevant documents, the language model may still produce a poor answer.
+
+Therefore, retrieval evaluation and generation evaluation should both be part of the system design.
+
+
+SECTION 13: PROMPT INJECTION SECURITY
+
+Retrieved documents should be treated as untrusted data.
+
+A malicious document may contain text such as instructions telling the language model to ignore the original system prompt, reveal secrets, or perform unauthorized actions.
+
+The RAG system should not treat retrieved document text as trusted instructions.
+
+System instructions should remain separate from retrieved evidence.
+
+The model should be told that retrieved content is reference material and must not override higher-priority system rules.
+
+Additional defenses can include input filtering, output filtering, tool permission checks, document trust levels, and security testing.
+
+Prompt injection protection is especially important when documents come from external or user-uploaded sources.
+
+
+SECTION 14: ACCESS CONTROL
+
+Enterprise knowledge systems often contain information with different sensitivity levels.
+
+Not every user should be able to retrieve every document.
+
+Access control should be applied before retrieved content is given to the language model.
+
+The retrieval layer should filter documents based on the user's permissions, team membership, department, role, or other authorization rules.
+
+This prevents sensitive information from being exposed through the AI assistant.
+
+Authorization should be enforced by application logic rather than depending only on the language model to follow instructions.
+
+
+SECTION 15: EVALUATION
+
+RAG systems should be evaluated at both the retrieval and generation levels.
+
+Retrieval evaluation measures whether the system finds the correct supporting information.
+
+Useful retrieval measures can include recall, precision, ranking position, relevance scores, and whether an expected source appears in the top results.
+
+Generation evaluation measures the quality of the final answer.
+
+Useful generation measures can include groundedness, answer relevance, citation accuracy, completeness, hallucination rate, and refusal behavior when evidence is missing.
+
+Evaluation datasets should contain representative questions and expected supporting information.
+
+The evaluation set should include easy questions, difficult questions, ambiguous questions, unsupported questions, and adversarial questions.
+
+Automated evaluation can be useful, but human review is also important for high-value applications.
+
+
+SECTION 16: GROUNDEDNESS
+
+Groundedness measures whether claims in the generated response are supported by the provided source context.
+
+A grounded answer should avoid adding unsupported facts that are not present in the retrieved information.
+
+One simple proxy is to verify that the answer contains source citations and that retrieved source chunks exist.
+
+More advanced groundedness evaluation can compare individual claims against supporting passages.
+
+A high groundedness score does not automatically mean that the answer is completely correct, because the source documents themselves may contain errors.
+
+Groundedness should therefore be interpreted as one quality signal rather than a complete measure of factual accuracy.
+
+
+SECTION 17: OBSERVABILITY
+
+Production AI systems should include observability.
+
+Useful operational metrics include request count, response latency, retrieval latency, language model latency, token usage, estimated cost, model errors, retrieval scores, and API failures.
+
+Logging can help engineers identify slow requests, failed retrievals, unusual model behavior, and expensive usage patterns.
+
+Tracing can also record the sequence of steps performed during a request, such as ingestion, retrieval, reranking, model generation, and response formatting.
+
+Observability is important because AI application quality can change when models, prompts, data, or retrieval settings are modified.
+
+
+SECTION 18: LATENCY
+
+Latency is the total time required to process a user request.
+
+A RAG request may involve several network and computation steps, including embedding generation, vector search, reranking, and language model generation.
+
+Each additional stage can improve quality but may also increase response time.
+
+Engineers should measure latency separately for retrieval and generation so that slow components can be identified.
+
+Caching frequently used embeddings or retrieval results can reduce unnecessary computation.
+
+Efficient retrieval and smaller prompts can also help reduce latency.
+
+
+SECTION 19: TOKEN USAGE AND COST
+
+Language model APIs often charge based on token usage.
+
+A RAG application should track how many input and output tokens are used for each request.
+
+Sending too many irrelevant document chunks increases prompt size and cost.
+
+Reranking can help control cost by selecting only the strongest context before calling the language model.
+
+Applications can also enforce maximum context sizes and response lengths.
+
+Cost monitoring is especially important for high-volume production systems.
+
+
+SECTION 20: CACHING
+
+Caching can improve performance and reduce repeated API calls.
+
+Document embeddings usually do not need to be regenerated every time a user submits a question.
+
+Embeddings can be created during ingestion and stored for later use.
+
+Query results may also be cached when the same or very similar questions are repeatedly asked.
+
+Care must be taken when caching responses that depend on frequently changing data or user-specific permissions.
+
+
+SECTION 21: FASTAPI BACKEND
+
+FastAPI can be used to expose the RAG pipeline as a web API.
+
+A health endpoint can verify that the service is running.
+
+An ask endpoint can accept a user's question and return a generated answer together with supporting sources.
+
+FastAPI automatically provides interactive API documentation, which makes endpoints easier to test during development.
+
+A production service should include input validation, structured error responses, authentication, logging, and configuration management.
+
+
+SECTION 22: ENVIRONMENT VARIABLES
+
+API keys and other secrets should not be hard-coded inside application source code.
+
+Secrets can be loaded through environment variables.
+
+A local environment file may be used during development, but the real secret file should not be committed to source control.
+
+A template file such as .env.example can document which environment variables are required without exposing sensitive values.
+
+Production deployments should use a secure secret-management system.
+
+
+SECTION 23: TESTING
+
+Automated tests help prevent regressions when the RAG system changes.
+
+Unit tests can verify individual functions such as text cleaning, chunking, keyword scoring, cosine similarity, and reranking.
+
+Integration tests can validate complete workflows such as document ingestion followed by retrieval.
+
+API tests can confirm that endpoints return expected status codes and response structures.
+
+Evaluation tests can verify that important questions continue to retrieve relevant sources after code changes.
+
+
+SECTION 24: DOCKER
+
+Docker can package the application together with its runtime dependencies.
+
+A Dockerfile defines how the application image is built.
+
+Containerization improves consistency between development, testing, and deployment environments.
+
+The same container image can run locally, in continuous integration, or on a cloud platform.
+
+Secrets such as API keys should be provided to the running container at runtime rather than stored inside the image.
+
+
+SECTION 25: CONTINUOUS INTEGRATION
+
+Continuous integration, commonly called CI, automatically checks changes when code is pushed to the repository.
+
+A CI workflow can install dependencies, run unit tests, execute linting, and verify that the application imports correctly.
+
+CI reduces the risk of merging changes that break the project.
+
+For an AI system, CI can also run a lightweight evaluation suite to detect retrieval or generation regressions.
+
+
+SECTION 26: AGENT WORKFLOWS
+
+An AI agent can select from multiple tools rather than following only a fixed retrieval pipeline.
+
+For example, an enterprise knowledge agent may have access to a document search tool, SQL query tool, calculator, or external API.
+
+The agent decides which tool is appropriate based on the user's question.
+
+Tool permissions should be controlled carefully because an agent may be able to perform actions rather than only generate text.
+
+Agent workflows should include limits, validation, logging, and clear separation between read-only tools and tools that can modify data.
+
+
+SECTION 27: LANGGRAPH
+
+LangGraph can be used to build structured agent workflows.
+
+A graph can represent different states and steps such as deciding which tool to use, retrieving information, generating a response, validating the output, and retrying when necessary.
+
+Graph-based workflows can make complex agent behavior easier to inspect and control.
+
+LangGraph is particularly useful when an application requires multiple reasoning steps or tool calls rather than a single LLM request.
+
+
+SECTION 28: PRODUCTION READINESS
+
+A production-ready enterprise AI knowledge assistant requires more than a working language model prompt.
+
+Important capabilities include reliable ingestion, high-quality retrieval, reranking, source citations, access control, security protections, evaluation, monitoring, automated testing, containerization, and deployment automation.
+
+The system should also handle failures gracefully.
+
+If an API call fails or relevant information cannot be retrieved, the application should return a clear error or safe fallback response.
+
+Quality, security, reliability, latency, and cost should all be measured as the application evolves.
