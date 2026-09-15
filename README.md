@@ -6,6 +6,9 @@ A production-style enterprise knowledge assistant built with Retrieval-Augmented
 
 The project demonstrates how to build a source-grounded AI assistant that retrieves relevant enterprise knowledge, reranks candidate documents, generates cited responses, and applies basic security controls before sending retrieved content to the language model.
 
+## API Demo
+
+![RAG API Demo](docs/rag_api_success.png)
 ---
 
 ## Features
