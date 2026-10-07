@@ -1,34 +1,35 @@
 # Enterprise AI Knowledge Agent
 
-**Tech Stack:** Python · FastAPI · LangGraph · OpenAI API · RAG · Hybrid Retrieval · Reranking · Pytest · Docker · GitHub Actions
-
 A production-style enterprise knowledge assistant built with Retrieval-Augmented Generation (RAG), LangGraph, FastAPI, hybrid retrieval, reranking, evaluation, prompt-injection protection, Docker, and automated CI testing.
 
-The project demonstrates how to build a source-grounded AI assistant that retrieves relevant enterprise knowledge, reranks candidate documents, generates cited responses, and applies basic security controls before sending retrieved content to the language model.
+The system retrieves relevant enterprise knowledge, reranks candidate documents, builds a source-grounded context, and generates cited answers while applying basic security controls to retrieved content before it reaches the language model.
+
+---
 
 ## API Demo
 
 The `/ask` endpoint accepts a user question and returns a source-grounded RAG response.
 
 ![RAG API Demo](docs/rag_api_success.png)
+
 ---
 
-## Features
+## What This Project Demonstrates
 
-- Document ingestion for TXT and PDF files
-- Configurable text chunking with overlap
-- OpenAI embeddings using `text-embedding-3-small`
+- TXT and PDF document ingestion
+- Configurable chunking with overlap
+- OpenAI embeddings
 - Semantic vector retrieval
 - Keyword-based lexical retrieval
-- Hybrid retrieval combining semantic and keyword scores
+- Hybrid retrieval
 - Retrieval reranking
 - Source-grounded answer generation
-- Source citations such as `[Source 1]`
-- LangGraph-based RAG workflow orchestration
+- Source citations
+- LangGraph orchestration
 - FastAPI REST API
-- Prompt-injection detection for retrieved content
-- Automated retrieval and groundedness evaluation
-- Pytest unit tests
+- Prompt-injection protection
+- Retrieval and groundedness evaluation
+- Pytest unit testing
 - GitHub Actions CI
 - Docker containerization
 
@@ -37,83 +38,44 @@ The `/ask` endpoint accepts a user question and returns a source-grounded RAG re
 ## Architecture
 
 ```text
-                    User Question
-                         |
-                         v
-                  +--------------+
-                  |   FastAPI    |
-                  +--------------+
-                         |
-                         v
-                 +----------------+
-                 |   LangGraph    |
-                 |   Workflow     |
-                 +----------------+
-                         |
-                         v
-                 +----------------+
-                 | Hybrid Search  |
-                 +----------------+
-                   /            \
-                  v              v
-        +----------------+   +----------------+
-        | Semantic Search|   | Keyword Search |
-        +----------------+   +----------------+
-                   \            /
-                    v          v
-                    +----------+
-                         |
-                         v
-                  +--------------+
-                  |  Reranking   |
-                  +--------------+
-                         |
-                         v
-                +------------------+
-                | Security Filter  |
-                | Prompt Injection |
-                +------------------+
-                         |
-                         v
-                +------------------+
-                | Context Builder  |
-                +------------------+
-                         |
-                         v
-                 +---------------+
-                 | OpenAI Model  |
-                 +---------------+
-                         |
-                         v
-              Grounded Answer + Sources
+User Question
+      |
+      v
+   FastAPI
+      |
+      v
+  LangGraph
+      |
+      v
+ Hybrid Search
+   /       \
+  v         v
+Semantic   Keyword
+Search     Search
+   \       /
+    v     v
+   Reranking
+      |
+      v
+ Security Filter
+      |
+      v
+ Context Builder
+      |
+      v
+   OpenAI Model
+      |
+      v
+Grounded Answer + Sources
 ```
 
----
-
-## LangGraph Workflow
-
-The RAG pipeline is orchestrated as a LangGraph state graph:
-
-```text
-retrieve
-   |
-   v
-rerank
-   |
-   v
-answer
-   |
-   v
- END
-```
-
-The workflow passes a shared state containing the query, retrieved documents, reranked results, constructed context, and final answer.
+The pipeline combines semantic and lexical retrieval, reranks candidate chunks, sanitizes retrieved content, builds the model context, and returns a cited response.
 
 ---
 
 ## Retrieval Pipeline
 
-The retrieval system combines semantic search and lexical matching.
+The retrieval system combines semantic and keyword search to improve both recall and precision.
 
 ### Semantic Retrieval
 
@@ -123,7 +85,7 @@ Documents are embedded using:
 text-embedding-3-small
 ```
 
-Cosine similarity is used to compare the user query with document chunks.
+Cosine similarity is used to compare user queries with document chunks.
 
 ### Keyword Retrieval
 
@@ -131,7 +93,7 @@ A lexical overlap score is calculated between query terms and document terms.
 
 ### Hybrid Retrieval
 
-The semantic and keyword scores are combined:
+The two retrieval signals are combined:
 
 ```text
 Hybrid Score =
@@ -140,13 +102,13 @@ Hybrid Score =
 0.3 × Keyword Score
 ```
 
-This helps the system retrieve both semantically similar content and exact keyword matches.
+This helps retrieve both semantically related content and exact keyword matches.
 
 ---
 
 ## Reranking
 
-Initial hybrid retrieval candidates are reranked before being passed to the language model.
+Initial retrieval candidates are reranked before being passed to the language model.
 
 The current lightweight reranker combines:
 
@@ -156,9 +118,7 @@ The current lightweight reranker combines:
 0.2 × Lexical Overlap Score
 ```
 
-This provides an additional relevance layer after retrieval.
-
-Example evaluation:
+Example:
 
 ```text
 Question:
@@ -175,13 +135,15 @@ chunk=5 rerank=0.5546
 chunk=12 rerank=0.4620
 ```
 
+This adds an additional relevance layer after retrieval.
+
 ---
 
 ## Prompt-Injection Protection
 
 Retrieved enterprise documents are treated as untrusted input.
 
-Before retrieved text is added to the language-model context, the security layer checks for suspicious instructions such as:
+Before retrieved text is added to the model context, the security layer checks for suspicious instructions such as:
 
 ```text
 Ignore previous instructions
@@ -190,7 +152,7 @@ Override instructions
 Disregard previous instructions
 ```
 
-Potential prompt-injection content is removed before context construction.
+Potentially malicious retrieved content is removed before context construction.
 
 Example:
 
@@ -198,7 +160,7 @@ Example:
 sanitize_retrieved_text(text)
 ```
 
-Malicious content is replaced with:
+Detected content is replaced with:
 
 ```text
 [Potential prompt-injection content removed from retrieved document.]
@@ -206,7 +168,34 @@ Malicious content is replaced with:
 
 ---
 
-## FastAPI API
+## LangGraph Workflow
+
+The RAG pipeline is orchestrated through a LangGraph state graph:
+
+```text
+retrieve
+   |
+   v
+rerank
+   |
+   v
+answer
+   |
+   v
+ END
+```
+
+The workflow state carries:
+
+- User query
+- Retrieved chunks
+- Reranked results
+- Constructed context
+- Final answer
+
+---
+
+## FastAPI Service
 
 Start the API locally:
 
@@ -214,33 +203,20 @@ Start the API locally:
 python -m uvicorn app.main:app --reload
 ```
 
-Open Swagger documentation:
+Open the Swagger documentation at:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-### Health Endpoint
+Available endpoints include:
 
-```http
-GET /health
-```
-
-Example response:
-
-```json
-{
-  "status": "healthy"
-}
-```
-
-### Ask Endpoint
-
-```http
+```text
+GET  /health
 POST /ask
 ```
 
-Example request:
+Example `/ask` request:
 
 ```json
 {
@@ -250,7 +226,7 @@ Example request:
 }
 ```
 
-The response contains the generated answer and retrieved source chunks.
+The response includes the generated answer and retrieved source chunks.
 
 ---
 
@@ -285,7 +261,7 @@ Chunk 9
 
 ## Evaluation
 
-The project contains several evaluation scripts under:
+The project includes evaluation scripts under:
 
 ```text
 evals/
@@ -297,19 +273,19 @@ evals/
 PYTHONPATH=. python -u evals/evaluate_rag.py
 ```
 
-The current evaluation checks whether expected concepts appear in generated answers.
+Checks whether expected concepts appear in generated answers.
 
-### Groundedness Proxy
+### Groundedness Evaluation
 
 ```bash
 PYTHONPATH=. python -u evals/evaluate_groundedness.py
 ```
 
-The current groundedness proxy checks:
+Checks:
 
-- whether source chunks were returned
-- whether the answer contains source citations
-- whether relevant retrieved chunks have positive retrieval scores
+- Whether source chunks were returned
+- Whether answers contain source citations
+- Whether relevant chunks have positive retrieval scores
 
 ### Retrieval Comparison
 
@@ -317,41 +293,41 @@ The current groundedness proxy checks:
 PYTHONPATH=. python -u evals/compare_retrieval.py
 ```
 
-This compares hybrid retrieval results before and after reranking.
+Compares hybrid retrieval results before and after reranking.
 
 ---
 
 ## Automated Tests
 
-Run the test suite with:
+Run:
 
 ```bash
 PYTHONPATH=. pytest -v
 ```
 
-Current tests cover:
-
-- text cleaning
-- document chunking
-- reranking behavior
-- prompt-injection detection
-- normal content handling
-- malicious-content sanitization
-
-Current local result:
+Current verified result:
 
 ```text
 6 passed
 ```
 
+Tests cover:
+
+- Text cleaning
+- Document chunking
+- Reranking behavior
+- Prompt-injection detection
+- Normal content handling
+- Malicious-content sanitization
+
 ---
 
-## Continuous Integration
+## CI/CD
 
 GitHub Actions automatically runs the test suite on:
 
-- pushes to `main`
-- pull requests targeting `main`
+- Pushes to `main`
+- Pull requests targeting `main`
 
 Workflow:
 
@@ -359,13 +335,13 @@ Workflow:
 .github/workflows/tests.yml
 ```
 
-This ensures new changes are automatically validated before integration.
+This provides automated validation before changes are integrated.
 
 ---
 
 ## Docker
 
-Build the Docker image:
+Build the image:
 
 ```bash
 docker build -t enterprise-ai-knowledge-agent .
@@ -423,17 +399,13 @@ Install dependencies:
 python -m pip install -r requirements.txt
 ```
 
----
-
-## Environment Variables
-
 Create a local `.env` file:
 
 ```text
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-Do not commit the `.env` file.
+Do not commit `.env`.
 
 The repository includes:
 
@@ -449,11 +421,9 @@ as a configuration template.
 
 ```text
 enterprise-ai-knowledge-agent/
-│
 ├── .github/
 │   └── workflows/
 │       └── tests.yml
-│
 ├── app/
 │   ├── agent_graph.py
 │   ├── hybrid_retriever.py
@@ -464,13 +434,10 @@ enterprise-ai-knowledge-agent/
 │   ├── retriever.py
 │   ├── security.py
 │   └── vector_store.py
-│
 ├── data/
 │   └── sample_document.txt
-│
 ├── docs/
 │   └── rag_api_success.png
-│
 ├── evals/
 │   ├── compare_retrieval.py
 │   ├── evaluate_groundedness.py
@@ -478,12 +445,10 @@ enterprise-ai-knowledge-agent/
 │   ├── groundedness_results.txt
 │   ├── reranking_results.txt
 │   └── results.txt
-│
 ├── tests/
 │   ├── test_ingest.py
 │   ├── test_reranker.py
 │   └── test_security.py
-│
 ├── .dockerignore
 ├── .env.example
 ├── .gitignore
@@ -494,73 +459,75 @@ enterprise-ai-knowledge-agent/
 
 ---
 
-## Technology Stack
+## Tech Stack
 
-### AI / LLM
-
+### AI & RAG
 - OpenAI API
+- OpenAI Embeddings
 - Retrieval-Augmented Generation
 - LangGraph
-- Embeddings
-
-### Backend
-
-- Python
-- FastAPI
-- Uvicorn
 
 ### Retrieval
-
 - Semantic search
 - Keyword search
 - Hybrid retrieval
 - Cosine similarity
 - Reranking
 
-### Security
+### Backend
+- Python
+- FastAPI
+- Uvicorn
 
+### Security
 - Prompt-injection detection
 - Retrieved-content sanitization
 
-### Testing / DevOps
-
+### Engineering
 - Pytest
 - GitHub Actions
 - Docker
 
 ---
 
-## Design Goals
+## Engineering Highlights
 
-This project focuses on several challenges commonly encountered when deploying enterprise AI assistants:
+This project demonstrates:
 
-- grounding LLM responses in enterprise knowledge
-- reducing hallucinations
-- combining multiple retrieval strategies
-- reranking candidate documents
-- returning source-backed responses
-- protecting the model from malicious retrieved instructions
-- exposing the system through an API
-- evaluating retrieval and answer behavior
-- building a reproducible deployment environment
-- automatically testing changes through CI
+- Source-grounded enterprise AI
+- Hybrid retrieval
+- Retrieval reranking
+- Source citations
+- LangGraph workflow orchestration
+- Prompt-injection protection
+- Automated RAG evaluation
+- Groundedness checks
+- REST API deployment pattern
+- Automated testing and CI
+- Containerized execution
+
+---
+
+## Current Scope
+
+The current implementation uses local document ingestion and an in-process retrieval setup suitable for demonstration and development.
+
+The security layer focuses on basic detection and sanitization of suspicious retrieved instructions.
+
+The evaluation suite uses lightweight proxies rather than a full production-grade evaluation platform.
 
 ---
 
 ## Future Improvements
 
-Potential future extensions include:
-
-- persistent vector database integration
-- authentication and document-level access control
-- conversation memory
-- improved cross-encoder or LLM-based reranking
-- retrieval caching
-- latency and token-cost observability
-- tracing
-- stronger prompt-injection classification
-- multi-document ingestion
-- asynchronous API processing
-- production deployment
-
----
+- Persistent vector database
+- Authentication and document-level access control
+- Conversation memory
+- Cross-encoder or LLM-based reranking
+- Retrieval caching
+- Latency and token-cost observability
+- Tracing
+- Stronger prompt-injection classification
+- Multi-document ingestion
+- Asynchronous API processing
+- Production deployment
