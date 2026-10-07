@@ -1,6 +1,6 @@
 # Enterprise AI Knowledge Agent
 
-A production-style enterprise knowledge assistant built with Retrieval-Augmented Generation (RAG), LangGraph, FastAPI, hybrid retrieval, reranking, evaluation, prompt-injection protection, Docker, and automated CI testing.
+A production-oriented enterprise knowledge assistant built with Retrieval-Augmented Generation (RAG), LangGraph, FastAPI, hybrid retrieval, reranking, evaluation, prompt-injection protection, Docker, and automated CI testing.
 
 The system retrieves relevant enterprise knowledge, reranks candidate documents, builds a source-grounded context, and generates cited answers while applying basic security controls to retrieved content before it reaches the language model.
 
