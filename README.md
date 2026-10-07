@@ -1,4 +1,5 @@
 # Enterprise AI Knowledge Agent
+[![Tests](https://github.com/Rishika73/enterprise-ai-knowledge-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/Rishika73/enterprise-ai-knowledge-agent/actions/workflows/tests.yml)
 
 A production-oriented enterprise knowledge assistant built with Retrieval-Augmented Generation (RAG), LangGraph, FastAPI, hybrid retrieval, reranking, evaluation, prompt-injection protection, Docker, and automated CI testing.
 
