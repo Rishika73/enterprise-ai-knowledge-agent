@@ -424,8 +424,10 @@ enterprise-ai-knowledge-agent/
 ├── .dockerignore
 ├── .env.example
 ├── .gitignore
+├── .python-version
 ├── Dockerfile
 ├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
