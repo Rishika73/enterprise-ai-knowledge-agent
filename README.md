@@ -37,42 +37,9 @@ The `/ask` endpoint accepts a user question and returns a source-grounded RAG re
 
 ## Architecture
 
-```text
-User Question
-      |
-      v
-   FastAPI
-      |
-      v
-  LangGraph
-      |
-      v
- Hybrid Search
-   /       \
-  v         v
-Semantic   Keyword
-Search     Search
-   \       /
-    v     v
-   Reranking
-      |
-      v
- Security Filter
-      |
-      v
- Context Builder
-      |
-      v
-   OpenAI Model
-      |
-      v
-Grounded Answer + Sources
-```
-## Architecture
-
 ![Enterprise AI Knowledge Agent Architecture](docs/enterprise-ai-knowledge-agent-architecture.png)
 
-The pipeline ingests enterprise documents, converts them into searchable chunks, combines semantic and keyword retrieval, reranks the best candidates, sanitizes retrieved content, and generates a grounded response with source citations.
+The pipeline ingests enterprise documents, combines semantic and keyword retrieval, reranks the strongest candidates, sanitizes retrieved content, and generates a source-grounded response with citations.
 
 ---
 
@@ -440,7 +407,8 @@ enterprise-ai-knowledge-agent/
 ├── data/
 │   └── sample_document.txt
 ├── docs/
-│   └── rag_api_success.png
+│   ├── rag_api_success.png
+│   └── enterprise-ai-knowledge-agent-architecture.png
 ├── evals/
 │   ├── compare_retrieval.py
 │   ├── evaluate_groundedness.py
