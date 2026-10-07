@@ -68,8 +68,11 @@ Search     Search
       v
 Grounded Answer + Sources
 ```
+## Architecture
 
-The pipeline combines semantic and lexical retrieval, reranks candidate chunks, sanitizes retrieved content, builds the model context, and returns a cited response.
+![Enterprise AI Knowledge Agent Architecture](docs/enterprise-ai-knowledge-agent-architecture.png)
+
+The pipeline ingests enterprise documents, converts them into searchable chunks, combines semantic and keyword retrieval, reranks the best candidates, sanitizes retrieved content, and generates a grounded response with source citations.
 
 ---
 
